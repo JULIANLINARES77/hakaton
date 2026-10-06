@@ -1,0 +1,58 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: campusreporta-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - campusreporta-ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: campusreporta-postgres
+    environment:
+      POSTGRES_DB: hakaton
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env o en el entorno}
+    ports:
+      - "5433:5432"
+    volumes:
+      - campusreporta-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hakaton"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: campusreporta-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/hakaton
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env o en el entorno}
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  campusreporta-postgres-data:
+  campusreporta-ollama-data:

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6fb">
+  <meta name="description" content="CampusReporta: reporta y consulta daños en los campus UNIMINUTO.">
+  <title>CampusReporta | UNIMINUTO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/datronix-theme.css">
+  <link rel="stylesheet" href="/uniminuto-theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+      <a class="brand" href="#" data-view="dashboard" aria-label="CampusReporta, inicio">
+        <span class="brand-mark"><i class="fa-solid fa-building-columns"></i></span>
+        <span class="brand-copy"><strong>Campus<span>Reporta</span></strong><small><i class="fa-solid fa-graduation-cap"></i> UNIMINUTO</small></span>
+        <button class="icon-button sidebar-collapse" id="collapseSidebar" type="button" aria-label="Colapsar menú"><i class="fa-solid fa-angles-left"></i></button>
+      </a>
+      <div class="nav-caption">MENÚ PRINCIPAL</div>
+      <nav class="side-nav">
+        <a class="nav-link active" href="#dashboard" data-view="dashboard"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+        <a class="nav-link" href="#nuevo" data-view="new"><i class="fa-solid fa-circle-plus"></i><span>Nuevo reporte</span></a>
+        <a class="nav-link" href="#mis-reportes" data-view="mine"><i class="fa-solid fa-list-check"></i><span>Mis reportes</span></a>
+        <a class="nav-link maintenance-only" href="#todos" data-view="all" hidden><i class="fa-solid fa-screwdriver-wrench"></i><span>Todos los reportes</span></a>
+        <a class="nav-link" href="#historial" data-view="history"><i class="fa-solid fa-clock-rotate-left"></i><span>Historial</span></a>
+        <a class="nav-link" href="#pdf" data-view="pdf"><i class="fa-regular fa-file-pdf"></i><span>Reportes PDF</span></a>
+      </nav>
+      <div class="sidebar-help">
+        <span class="help-icon"><i class="fa-regular fa-lightbulb"></i></span>
+        <strong>¿Viste algo que reparar?</strong>
+        <p>Ayúdanos a cuidar juntos nuestros espacios.</p>
+        <button class="help-link" type="button" data-go="new">Crear reporte <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+      <div class="sidebar-footer"><span class="status-dot"></span> Sistema operativo <span class="version">v1.0</span></div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" id="mobileMenu" type="button" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+        <div class="breadcrumb"><span>CampusReporta</span><i class="fa-solid fa-chevron-right"></i><strong id="breadcrumbCurrent">Dashboard</strong></div>
+        <div class="topbar-actions">
+          <div class="campus-label"><i class="fa-solid fa-building-columns"></i><span>UNIMINUTO · Campus Bogotá</span></div>
+          <span class="topbar-divider"></span>
+          <label class="role-select-label" for="roleSelect"><i class="fa-solid fa-user"></i><span class="sr-only">Seleccionar rol</span></label>
+          <select class="role-select" id="roleSelect" aria-label="Selecciona tu rol">
+            <option value="Estudiante">Estudiante</option>
+            <option value="Docente">Docente</option>
+            <option value="Mantenimiento">Mantenimiento</option>
+          </select>
+          <span class="avatar" id="userAvatar">AT</span>
+        </div>
+      </header>
+
+      <main class="main-content" id="mainContent" tabindex="-1"></main>
+      <footer class="page-footer"><span><i class="fa-solid fa-building-columns university-footer-mark" aria-hidden="true"></i> © 2025 UNIMINUTO · CampusReporta</span><span>Juntos cuidamos nuestro campus <i class="fa-solid fa-heart"></i></span></footer>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="icon-button modal-close" type="button" data-close-modal aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+      <div id="modalContent"></div>
+    </section>
+  </div>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <button class="ai-launcher" id="aiLauncher" type="button" aria-label="Abrir CampusReporta IA" aria-expanded="false">
+    <span class="ai-launcher-face" aria-hidden="true"><span class="robot-antenna"></span><span class="robot-eyes"><i></i><i></i></span><span class="robot-smile"></span></span>
+    <span class="ai-launcher-label">Habla con Laura</span>
+    <span class="ai-launcher-sparkle" aria-hidden="true"><i class="fa-solid fa-sparkles"></i></span>
+  </button>
+  <section class="ai-panel" id="aiPanel" aria-label="Asistente de CampusReporta" hidden>
+    <header class="ai-header">
+      <span class="ai-avatar" aria-hidden="true"><span class="robot-eyes"><i></i><i></i></span><span class="robot-smile"></span></span>
+      <span class="ai-header-copy"><strong>Laura <span class="ai-badge">IA</span></strong><small><span class="ai-online-dot"></span>Asistente del campus</small></span>
+      <button class="ai-header-button active" id="aiSpeakToggle" type="button" aria-label="Silenciar respuestas de Laura" aria-pressed="true" title="Silenciar respuestas"><i class="fa-solid fa-volume-high"></i></button>
+      <button class="ai-header-button" id="aiClose" type="button" aria-label="Cerrar asistente"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+    <div class="ai-messages" id="aiMessages" role="log" aria-live="polite" aria-relevant="additions text"></div>
+    <div class="ai-suggestions" id="aiSuggestions">
+      <button type="button" data-ai-prompt="¿Cuántos reportes hay en cada estado?">Resumen de estados</button>
+      <button type="button" data-ai-prompt="¿Qué reportes siguen pendientes?">Ver pendientes</button>
+      <button type="button" data-ai-prompt="Resume los problemas reportados por ubicación.">Por ubicación</button>
+    </div>
+    <form class="ai-compose" id="aiForm">
+      <button class="ai-tool-button ai-mic-button" id="aiMic" type="button" aria-label="Dictar pregunta" title="Dictar pregunta"><i class="fa-solid fa-microphone"></i></button>
+      <label class="sr-only" for="aiInput">Escribe tu pregunta</label>
+      <textarea id="aiInput" rows="1" maxlength="1200" placeholder="Pregúntame sobre el campus..." required></textarea>
+      <button class="ai-send-button" id="aiSend" type="submit" aria-label="Enviar pregunta"><i class="fa-solid fa-arrow-up"></i></button>
+    </form>
+    <footer class="ai-footer"><i class="fa-solid fa-shield-halved"></i> Respuestas basadas en los reportes del campus</footer>
+  </section>
+  <script src="/chat-widget.js" defer></script>
+</body>
+</html>
